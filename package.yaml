@@ -81,12 +81,29 @@ library:
 tests:
   course-tests:
     main: Spec.hs
-    source-dirs: test
+    source-dirs:
+      - test
+      - src
     ghc-options:
     - -threaded
+    other-modules:
+    - Course.ApplicativeSpec
+    - Course.ComonadSpec
+    - Course.ExtendSpec
+    - Course.FunctorSpec
+    - Course.Gens
+    - Course.JsonParserSpec
+    - Course.ListSpec
+    - Course.ListZipperSpec
+    - Course.MonadSpec
+    - Course.OptionalSpec
+    - Course.StateSpec
+    - Course.StateTSpec
+    - Course.ValidationSpec
+    - Paths_course
     dependencies:
     - base <5 && >=3
-    - course
     - hspec
     - hspec-discover
     - QuickCheck >=2.9
+    - containers >=0.4.0.0
