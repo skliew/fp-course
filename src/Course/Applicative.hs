@@ -69,9 +69,14 @@ instance Applicative List where
     List (a -> b)
     -> List a
     -> List b
-  (<*>) _ Nil = Nil
-  (<*>) Nil _ = Nil
-  (<*>) (x:.xs) l = (map x l) ++ (xs <*> l)
+  -- (<*>) f a = map _f f
+  -- _f should be (a -> b) -> b
+  -- (<*>) f a = map (_f a) f
+  -- _f should be List a -> (a -> b) -> b
+  -- (<*>) f a = map ((flip map) a) f
+  -- map :: (List a -> (a -> b) -> List b) -> List (a -> b) -> List (List b)
+  -- thus we have to flatten it
+  (<*>) f a = flatMap ((flip map) a) f
 
 -- | Insert into an Optional.
 --
@@ -94,9 +99,14 @@ instance Applicative Optional where
     Optional (a -> b)
     -> Optional a
     -> Optional b
-  (<*>) _ Empty = Empty
-  (<*>) Empty _ = Empty
-  (<*>) (Full f) (Full a) = Full (f a)
+  -- (<*>) f a = mapOptional _f f
+  -- _f should be (a -> b) -> b
+  -- (<*>) f a = mapOptional (_f a) f
+  -- _f should be Optional a -> (a -> b) -> b
+  -- (<*>) f a = mapOptional ((flip mapOptional) a) f
+  -- mapOptional :: ((a -> b) -> Optional b) -> Optional (a -> b) -> Optional (Optional b) -- not possible
+  -- bindOptional :: ((a -> b) -> Optional b) -> Optional (a -> b) -> Optional b
+  (<*>) f a = bindOptional ((flip mapOptional) a) f
 
 -- | Insert into a constant function.
 --
@@ -316,12 +326,9 @@ sequence ::
   Applicative f =>
   List (f a)
   -> f (List a)
-sequence Nil = pure Nil
-  -- (<*>) ::
-  --   f (a -> b)
-  --   -> f a
-  --   -> f b
-sequence (x:.xs) = lift2 (:.) x (sequence xs)
+-- sequence Nil = pure Nil
+-- sequence (x:.xs) = lift2 (:.) x (sequence xs)
+sequence = foldRight (lift2 (:.))  (pure Nil)
 
 -- | Replicate an effect a given number of times.
 --
@@ -344,9 +351,9 @@ replicateA ::
   Int
   -> f a
   -> f (List a)
-replicateA 0 _ = pure Nil
-replicateA n f = lift2 (:.) f (replicateA (n - 1) f)
--- replicateA n = (sequence . replicate n)
+-- replicateA 0 _ = pure Nil
+-- replicateA n f = lift2 (:.) f (replicateA (n - 1) f)
+replicateA n =  sequence . replicate n
 
 -- | Filter a list with a predicate that produces an effect.
 --
@@ -373,9 +380,13 @@ filtering ::
   (a -> f Bool)
   -> List a
   -> f (List a)
-filtering _ Nil = pure Nil
-filtering p (x:.xs) =
-  lift2 (\b -> if b then (x:.) else id) (p x) (filtering p xs)
+-- filtering _ Nil = pure Nil
+-- filtering p (x:.xs) =
+--   lift2 (\b -> if b then (x:.) else id) (p x) (filtering p xs)
+-- filtering p =
+--   foldRight (\a -> lift2 (\b -> (\c -> if b then (a :. c) else c)) (p a)) (pure Nil)
+filtering p =
+  foldRight (\a -> lift2 (\b -> if b then (a:.) else id) (p a)) (pure Nil)
 
 -- Note: Should probably try implementing functions non-recursively using folds.
 -- However by rolling my own I start recognizing patterns.
