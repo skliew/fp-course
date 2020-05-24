@@ -100,14 +100,48 @@ printFiles =
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
-getFile ::
-  FilePath
-  -> IO (FilePath, Chars)
+getFile :: ((->) FilePath (IO (FilePath, Chars)))
+  -- FilePath
+  -- -> IO (FilePath, Chars)
 getFile =
   lift2 (<$>) (,) readFile
+-- getFile f = (,) f <$> readFile f
+-- readFile f  ->  IO Chars
+-- (,) f :: Chars -> (FilePath, Chars)
+-- (<$>) = (a -> b) -> f a -> f b
+-- (a -> b) = Chars -> (FilePath, Chars)
+-- a = Chars
+-- f = IO
+-- b = (FilePath, Chars)
+-- lift2 f as bs = do
+--   a <- as
+--   b <- bs
+--   pure (f a b)
+-- as :: FilePath -> Chars -> (FilePath, Chars)
+-- bs :: FilePath -> IO Chars
+-- For reader
+-- as >>= f ... -> \x -> f (as x) x
+-- f :: (a -> (x -> b))
+-- a :: Chars -> (FilePath, Chars)
+-- b :: IO Chars
+-- f a b :: IO (FilePath, Chars)
+-- pure (f a b) = ((->) FilePath (IO (FilePath, Chars))
 -- getFile path = do
 --   content <- readFile path
 --   return (path, content)
+
+getFile2 :: FilePath -> IO (FilePath, Chars, Chars)
+-- getFile2 file = ((,,) file) <$> readFile file <*> readFile file
+getFile2 = lift3 lift2 (,,) readFile readFile
+-- For lift3
+-- a :: Chars -> Chars -> (FilePath, Chars, Chars)
+-- b :: IO Chars
+-- c :: IO Chars
+-- For lift2
+-- a = Chars
+-- b = Chars
+-- f = IO
+-- c = (FilePath, Chars, Chars)
 
 -- Given a list of file names, return list of (file name and file contents).
 -- Use @getFile@.
