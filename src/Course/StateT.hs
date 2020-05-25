@@ -215,6 +215,8 @@ distinctF list =
   evalT (filtering (\x -> StateT (\s -> if x > 100
                                         then Empty
                                         else return (S.notMember x s, S.insert x s))) list) S.empty
+-- Note: filtering :: (a -> StateT Set Optional Bool) -> List a -> StateT Set Optional (List a)
+-- For StateT Set Optional Bool,  StateT :: Set -> Optional (Bool, Set)
 
 -- | An `OptionalT` is a functor of an `Optional` value.
 data OptionalT f a =
@@ -343,6 +345,9 @@ distinctG list =
                else (if even x
                     then log1 (fromString ("even number: " P.++ show x))
                     else pure) (Full (S.notMember x s, S.insert x s))))) list) S.empty
+-- Note: filtering :: (a -> StateT Set (OptionalT (Logger Char)) Bool) -> List a -> StateT Set (OptionalT (Logger Chars)) (List a)
+-- For StateT Set (OptionalT (Logger Chars)) Bool,  StateT :: Set -> OptionalT (Logger Chars) (Bool, Set)
+-- For OptionalT (Logger Chars) (Bool, Set), Optional :: Logger Chars (Optional (Bool, Set))
 
 onFull ::
   Applicative f =>
