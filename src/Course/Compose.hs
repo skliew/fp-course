@@ -16,20 +16,39 @@ newtype Compose f g a =
 -- Implement a Functor instance for Compose
 instance (Functor f, Functor g) =>
     Functor (Compose f g) where
-  (<$>) =
-    error "todo: Course.Compose (<$>)#instance (Compose f g)"
+  (<$>) f (Compose a) = Compose ((f <$>) <$> a)
 
 instance (Applicative f, Applicative g) =>
   Applicative (Compose f g) where
 -- Implement the pure function for an Applicative instance for Compose
   pure =
-    error "todo: Course.Compose pure#instance (Compose f g)"
+    Compose . pure . pure
 -- Implement the (<*>) function for an Applicative instance for Compose
-  (<*>) =
-    error "todo: Course.Compose (<*>)#instance (Compose f g)"
+  -- (<*>) (Compose f) (Compose a) = Compose ((_f f) a)
+  -- _f :: f (g (a -> b)) -> f (g a) -> f (g b)
+  -- (<*>) (Compose f) (Compose a) = Compose ((pure (<*>) <*> f) <*> a)
+  -- OR
+  -- (<*>) (Compose f) (Compose a) = Compose ((<*>) (_f f) a)
+  -- _f :: (f (g (a -> b)) -> f (g a -> g b)
+  -- Look at the inner g (a -> b) -> g a -> g b
+  -- To make <*> work in the inner Applicative, 
+  -- (<*>) (Compose f) (Compose a) = Compose ((<*>) (pure (<*>) <*> f) a)
+  -- (<*>) (Compose f) (Compose a) = Compose ((pure (<*>)) <*> f <*> a)
+  (<*>) (Compose f) (Compose a) = Compose (lift2 (<*>) f a)
 
+  -- f (g (a -> b)) -> f (g a) -> f (g b)
+  -- (<*>) ::
+  --   f (a -> b)
+  --   -> f a
+  --   -> f b
+-- lift2 ::
+--   Applicative f =>
+--   (a -> b -> c)
+--   -> f a
+--   -> f b
+--   -> f c
 instance (Monad f, Monad g) =>
   Monad (Compose f g) where
 -- Implement the (=<<) function for a Monad instance for Compose
   (=<<) =
-    error "todo: Course.Compose (<<=)#instance (Compose f g)"
+    error "impossible"
