@@ -100,6 +100,7 @@ tests:
     - Course.StateSpec
     - Course.StateTSpec
     - Course.ValidationSpec
+    - Course.TraversableSpec
     - Paths_course
     dependencies:
     - base <5 && >=3
