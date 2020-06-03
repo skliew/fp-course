@@ -321,7 +321,7 @@ sepby ::
   Parser a
   -> Parser s
   -> Parser (List a)
-sepby sep p =  sepby1 sep p ||| valueParser Nil
+sepby p sep =  sepby1 p sep ||| valueParser Nil
 
 -- | Write a parser that asserts that there is no remaining input.
 --
