@@ -102,6 +102,7 @@ tests:
     - Course.ValidationSpec
     - Course.TraversableSpec
     - Course.ParserSpec
+    - Course.MoreParserSpec
     - Paths_course
     dependencies:
     - base <5 && >=3
