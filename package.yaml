@@ -88,6 +88,7 @@ tests:
     - -threaded
     other-modules:
     - Course.ApplicativeSpec
+    - Course.ChecqueSpec
     - Course.ComonadSpec
     - Course.ExtendSpec
     - Course.FunctorSpec
