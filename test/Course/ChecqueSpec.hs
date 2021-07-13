@@ -17,7 +17,7 @@ spec = chequeDollars
 
 chequeDollars :: Spec
 chequeDollars =
-  describe "jsonObject" $ do
+  describe "dollars" $ do
     it "empty" $ do
       dollars "0" `shouldBe` "zero dollars and zero cents"
     it "dollars '1'" $

@@ -374,18 +374,30 @@ showDigit3 d =
 toDot ::
   Chars
   -> (List Digit, Chars)
+-- toDot =
+--   let toDot' x Nil =
+--         (x, Nil)
+--       toDot' x (h:.t) =
+--         let move = case fromChar h of
+--                      Full n -> toDot' . (:.) n
+--                      Empty -> if h == '.'
+--                                   then
+--                                     (,)
+--                                   else
+--                                      toDot'
+--         in move x t
+--   in toDot' Nil
 toDot =
   let toDot' x Nil =
         (x, Nil)
       toDot' x (h:.t) =
-        let move = case fromChar h of
-                     Full n -> toDot' . (:.) n
-                     Empty -> if h == '.'
-                                  then
-                                    (,)
-                                  else
-                                     toDot'
-        in move x t
+        case fromChar h of
+        Full n -> toDot' (n :. x) t
+        Empty -> if h == '.'
+                 then
+                   (x,t)
+                 else
+                   toDot' x t
   in toDot' Nil
 
 illionate ::
